@@ -1,27 +1,30 @@
-FROM oven/bun:1
-
+FROM oven/bun:1 AS deps
 WORKDIR /usr/src/app
 
-# root folder copy source code
-COPY ./packages ./packages
-COPY ./bun.lock ./bun.lock
+# 1) Copy only manifests for better cache reuse
+COPY package.json bun.lock turbo.json ./
+COPY apps/backend/package.json ./apps/backend/package.json
+COPY packages/db/package.json ./packages/db/package.json
 
-# Copy package.json and turbo.json
-COPY ./package.json ./package.json
-COPY ./turbo.json ./turbo.json
+# 2) Install deps once (cached unless manifests change)
+RUN bun install --frozen-lockfile
 
-# Copy backend source code first so that we can cache the dependencies.
-COPY ./apps/backend ./apps/backend
+# 3) Copy source after deps are cached
+COPY apps/backend ./apps/backend
+COPY packages/db ./packages/db
 
-# Install dependencies
-RUN bun install
-
+# 4) Prisma generate needs DATABASE_URL at build-time
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
-
-# Generate Prisma client. why? because we need to generate the Prisma client before we can use it in the backend.
 RUN bun run db:generate
 
-EXPOSE 8080
+# ----- runtime -----
+FROM oven/bun:1 AS runtime
+WORKDIR /usr/src/app
+ENV NODE_ENV=production
 
+# copy only runtime artifacts
+COPY --from=deps /usr/src/app /usr/src/app
+
+EXPOSE 8080
 CMD ["bun", "run", "start:backend"]
