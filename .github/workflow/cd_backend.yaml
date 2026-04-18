@@ -1,8 +1,4 @@
-## Build the docker code 
-# push the docker imag to docker hub 
-## ssh init our vm and start the new image 
-
-name: Continuous Deployment (Prod) (Backend)
+name: Continuous Deployment
 on:
   push:
     branches: [ main ]
