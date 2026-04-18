@@ -22,6 +22,6 @@ ENV DATABASE_URL=$DATABASE_URL
 # Generate Prisma client. why? because we need to generate the Prisma client before we can use it in the backend.
 RUN bun run db:generate
 
-EXPOSE 18080
+EXPOSE 8080
 
 CMD ["bun", "run", "start:backend"]
