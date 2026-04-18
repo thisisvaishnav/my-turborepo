@@ -15,6 +15,10 @@ COPY ./apps/backend ./apps/backend
 
 # Install dependencies
 RUN bun install
+
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+
 # Generate Prisma client. why? because we need to generate the Prisma client before we can use it in the backend.
 RUN bun run db:generate
 
