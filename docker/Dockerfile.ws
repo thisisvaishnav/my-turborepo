@@ -1,22 +1,18 @@
-FROM oven/bun:1.3.10
+FROM oven/bun:1
 
-WORKDIR /app
+WORKDIR /usr/src/app
 
-# Copy workspace manifests first (better cache)
-COPY package.json bun.lock ./
-COPY apps/websocket/package.json apps/websocket/package.json
-COPY packages/db/package.json packages/db/package.json
+COPY ./packages ./packages
+COPY ./bun.lock ./bun.lock
 
-# Install workspace deps
-RUN bun install --frozen-lockfile
+COPY ./package.json ./package.json
+COPY ./turbo.json ./turbo.json
 
-# Copy source code
-COPY apps/websocket apps/websocket
-COPY packages/db packages/db
+COPY ./apps/websocket ./apps/websocket
 
-# Run websocket app
-WORKDIR /app/apps/websocket
+RUN bun install
+RUN bun run db:generate
 
 EXPOSE 8081
 
-CMD ["bun", "run", "index.ts"]
+CMD ["bun", "run", "start:websocket"]
