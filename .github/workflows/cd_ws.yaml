@@ -22,6 +22,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./docker/Dockerfile.frontend
+          file: ./docker/Dockerfile.ws
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-app-frontend:${{ github.sha }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/todo-app-ws:${{ github.sha }}
+
+          
