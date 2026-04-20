@@ -4,13 +4,17 @@ WORKDIR /usr/src/app
 
 COPY ./packages ./packages
 COPY ./bun.lock ./bun.lock
-
 COPY ./package.json ./package.json
 COPY ./turbo.json ./turbo.json
 
 COPY ./apps/websocket ./apps/websocket
 
 RUN bun install
+
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
+ENV NODE_ENV=production
+
 RUN bun run db:generate
 
 EXPOSE 8081
